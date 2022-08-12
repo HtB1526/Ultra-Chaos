@@ -318,7 +318,7 @@ while wait(0.1) do
                     end
                 end
                 rs:Wait()
-            end
-        end)
+            end)
+        end
     end)
 end
