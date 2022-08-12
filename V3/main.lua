@@ -32,7 +32,7 @@ if identifyexec()=="Synapse X"then
 end
 --Settings
 local Selected = "Blood Dagger" -- // values: see WeaponTable
-local WeaponsOnRespawn = true
+local WeaponsOnRespawn = false
 local Minigun_Enabled = false
 local DupeItems = false
 local SpamGrenade = false
@@ -40,11 +40,11 @@ local SpamSpike = false
 local SpamC4 = false
 local KillAll = false
 local KillAura = false
-local SilentKillAura=true
-local EquipToolsOnKillAura=true
+local SilentKillAura=false
+local EquipToolsOnKillAura=false
 local KA_Range = 10
-local ClearBackpackOnDeath=true
-local IgnoreList = {"milapakjim","nagibatjr2"}
+local ClearBackpackOnDeath=false
+local IgnoreList = {}
 local WeaponTable = {"Mace","Chainsaw","Knife","Pan","Pencil","Baseball Bat","Scythe","Blood Dagger","Emerald Greatsword"}
 Misc:NewButton("Infinite Yield",loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source")))
 local function _setclipboard(str)
@@ -59,7 +59,7 @@ Misc:NewButton("JobId: "..game.JobId,function()
     _setclipboard('game:GetService("TeleportService"):TeleportToPlaceInstance('..game.PlaceId..',"'..game.JobId..'")')
 end)
 Misc:NewToggle("Prints error into Internal ui",function(b)
-    if identifyexec()=="Synapse X"then
+    if identifyexec()=="Synapse X"and (is_redirection_enabled and is_redirection_enabled())then
         UI.Log:Info("Setted InternalUIEnabled to "..tostring(b))
         ______Synapse.InternalUIEnabled = b
     end
@@ -208,103 +208,117 @@ end)
 while wait(0.1) do
     AddAsync(function()
         if Minigun_Enabled then
-            for i, v in pairs(LocalPlayer.Backpack:GetChildren()) do
-                if v.Name == "Kawaii Revolver" then
-                    if Minigun_Enabled then
-                        LocalPlayer.Character.Humanoid:EquipTool(v)
-                        v:Activate()
-                        rs:Wait()
+            AddAsync(function()
+                for i, v in pairs(LocalPlayer.Backpack:GetChildren()) do
+                    if v.Name == "Kawaii Revolver" then
+                        if Minigun_Enabled then
+                            LocalPlayer.Character.Humanoid:EquipTool(v)
+                            v:Activate()
+                            rs:Wait()
+                        end
                     end
                 end
-            end
+            end)
         elseif DupeItems then
-            if LocalPlayer.Character:FindFirstChild"Loaded"then LocalPlayer.Character.Loaded:Destroy()end
-            if LocalPlayer.PlayerGui:FindFirstChild"Menu Screen".Enabled then LocalPlayer.PlayerGui:FindFirstChild"Menu Screen".Enabled = false end
-            LocalPlayer.PlayerGui:FindFirstChild("Menu Screen"):FindFirstChild("RemoteEvent"):FireServer(Selected)
+            AddAsync(function()
+                if LocalPlayer.Character:FindFirstChild"Loaded"then LocalPlayer.Character.Loaded:Destroy()end
+                if LocalPlayer.PlayerGui:FindFirstChild"Menu Screen".Enabled then LocalPlayer.PlayerGui:FindFirstChild"Menu Screen".Enabled = false end
+                LocalPlayer.PlayerGui:FindFirstChild("Menu Screen"):FindFirstChild("RemoteEvent"):FireServer(Selected)
+            end)
         elseif SpamGrenade then
-            for i, v in pairs(LocalPlayer.Backpack:GetChildren()) do
-                if v.Name == "Grenade" then
-                    if SpamGrenade then
-                        LocalPlayer.Character.Humanoid:EquipTool(v)
-                        v:Activate()
-                        rs:Wait()
+            AddAsync(function()
+                for i, v in pairs(LocalPlayer.Backpack:GetChildren()) do
+                    if v.Name == "Grenade" then
+                        if SpamGrenade then
+                           LocalPlayer.Character.Humanoid:EquipTool(v)
+                            v:Activate()
+                            rs:Wait()
+                        end
                     end
                 end
-            end
+            end)
         elseif SpamSpike then
-            for i, v in pairs(LocalPlayer.Backpack:GetChildren()) do
-                if v.Name == "Spiked Trap" then
-                    if SpamSpike then
-                        LocalPlayer.Character.Humanoid:EquipTool(v)
-                        v:Activate()
-                        rs:Wait()
+            AddAsync(function()
+                for i, v in pairs(LocalPlayer.Backpack:GetChildren()) do
+                    if v.Name == "Spiked Trap" then
+                        if SpamSpike then
+                            LocalPlayer.Character.Humanoid:EquipTool(v)
+                           v:Activate()
+                            rs:Wait()
+                        end
                     end
                 end
-            end
+            end)
         elseif SpamC4 then
-            for i, v in pairs(LocalPlayer.Backpack:GetChildren()) do
-                if v.Name == "C4" then
-                    if SpamC4 then
-                        LocalPlayer.Character.Humanoid:EquipTool(v)
-                        v:Activate()
-                        rs:Wait()
+            AddAsync(function()
+                for i, v in pairs(LocalPlayer.Backpack:GetChildren()) do
+                    if v.Name == "C4" then
+                        if SpamC4 then
+                            LocalPlayer.Character.Humanoid:EquipTool(v)
+                            v:Activate()
+                           rs:Wait()
+                        end
                     end
                 end
-            end
+            end)
         elseif KillAll then
-            for i, v in pairs(LocalPlayer.Backpack:GetChildren()) do
-                if v:FindFirstChild("DamageRemote") then
-                    LocalPlayer.Character.Humanoid:EquipTool(v)
-                    local targ
-                    local range = math.huge
-                    for i, v in pairs(workspace:GetChildren()) do
-                        if v ~= LocalPlayer.Character and not table.find(IgnoreList, v.Name:lower()) then
-                            local vhum = v:FindFirstChild("Humanoid")
-                            local vroot = v:FindFirstChild("HumanoidRootPart")
-                            if vhum and vroot and LocalPlayer.Character.HumanoidRootPart then
-                                local dist = (vroot.Position - LocalPlayer.Character.HumanoidRootPart.Position).magnitude
-                                if vhum.Health > 0 and not v:FindFirstChild"ForceField"and tonumber(dist)<=range then
-                                    targ = vhum
-                                    range = dist
+            AddAsync(function()
+                for i, v in pairs(LocalPlayer.Backpack:GetChildren()) do
+                    if v:FindFirstChild("DamageRemote") then
+                        LocalPlayer.Character.Humanoid:EquipTool(v)
+                        local targ
+                        local range = math.huge
+                        for i, v in pairs(workspace:GetChildren()) do
+                            if v ~= LocalPlayer.Character and not table.find(IgnoreList, v.Name:lower()) then
+                                local vhum = v:FindFirstChild("Humanoid")
+                                local vroot = v:FindFirstChild("HumanoidRootPart")
+                                if vhum and vroot and LocalPlayer.Character.HumanoidRootPart then
+                                    local dist = (vroot.Position - LocalPlayer.Character.HumanoidRootPart.Position).magnitude
+                                    if vhum.Health > 0 and not v:FindFirstChild"ForceField"and tonumber(dist)<=range then
+                                        targ = vhum
+                                        range = dist
+                                    end
                                 end
                             end
                         end
-                    end
-                    rs:Wait()
-                    if targ then
-                        v.DamageRemote:FireServer(targ)
-                    end
-                end
-            end
-        elseif KillAura then
-            local targ
-            local Range = KA_Range
-            for i, v in pairs(workspace:GetChildren()) do
-                if v ~= LocalPlayer.Character and not table.find(IgnoreList, v.Name:lower()) then
-                    local vhum = v:FindFirstChild("Humanoid")
-                    local vroot = v:FindFirstChild("HumanoidRootPart")
-                    if vhum and vroot and LocalPlayer.Character.HumanoidRootPart then
-                        local dist =(vroot.Position - LocalPlayer.Character.HumanoidRootPart.Position).magnitude
-                        if vhum.Health>0 and not v:FindFirstChild"ForceField"and tonumber(dist)<=tonumber(Range)then
-                            targ = vhum
-                            Range = dist
+                        rs:Wait()
+                        if targ then
+                            v.DamageRemote:FireServer(targ)
                         end
                     end
                 end
-            end
-            if targ then
-                for i, v in pairs(LocalPlayer.Backpack:GetChildren()) do
-                    if table.find(WeaponTable,v.Name) then
-                        LocalPlayer.Character.Humanoid:EquipTool(v)
-                        if LocalPlayer.Character:FindFirstChild(v.Name)then break end
+            end)
+        elseif KillAura then
+            AddAsync(function()
+                local targ
+                local Range = KA_Range
+                for i, v in pairs(workspace:GetChildren()) do
+                    if v ~= LocalPlayer.Character and not table.find(IgnoreList, v.Name:lower()) then
+                        local vhum = v:FindFirstChild("Humanoid")
+                        local vroot = v:FindFirstChild("HumanoidRootPart")
+                        if vhum and vroot and LocalPlayer.Character.HumanoidRootPart then
+                            local dist =(vroot.Position - LocalPlayer.Character.HumanoidRootPart.Position).magnitude
+                            if vhum.Health>0 and not v:FindFirstChild"ForceField"and tonumber(dist)<=tonumber(Range)then
+                                targ = vhum
+                                Range = dist
+                            end
+                        end
                     end
                 end
-                LocalPlayer.Character:FindFirstChildOfClass("Tool").DamageRemote:FireServer(targ)
-                if SilentKillAura then
-                    LocalPlayer.Character.Humanoid:UnequipTools()
+                if targ then
+                    for i, v in pairs(LocalPlayer.Backpack:GetChildren()) do
+                        if table.find(WeaponTable,v.Name) then
+                            LocalPlayer.Character.Humanoid:EquipTool(v)
+                        if LocalPlayer.Character:FindFirstChild(v.Name)then break end
+                        end
+                    end
+                    LocalPlayer.Character:FindFirstChildOfClass("Tool").DamageRemote:FireServer(targ)
+                    if SilentKillAura then
+                        LocalPlayer.Character.Humanoid:UnequipTools()
+                    end
                 end
+                rs:Wait()
             end
-            rs:Wait()
-        end
+        end)
     end)
 end
